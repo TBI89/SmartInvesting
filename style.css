@@ -1,0 +1,79 @@
+@font-face {
+    font-family: "title";
+    src: url(assets/fonts/TiltPrism-Regular-VariableFont_XROT\,YROT.ttf);
+}
+
+h1 {
+    font-family: "title";
+    font-size: 100px;
+    text-align: center;
+    color: dodgerblue
+}
+
+body {
+    margin: 0;
+    background-image: url(assets/images/main-background.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#reportSection,
+#aboutSection {
+    display: none;
+    color: white;
+}
+
+#searchButton {
+    background-color: rgb(0, 102, 255);
+    color: white;
+}
+
+#searchInput {
+    margin-left: 10px;
+}
+
+#coinsContainer {
+    font-size: small;
+}
+
+.nav-link {
+    cursor: pointer;
+}
+
+.card {
+    display: inline-block;
+    background-image: linear-gradient(45deg, dodgerblue, lightBlue);
+}
+
+.nav-link {
+    color: white;
+}
+
+#progressBar {
+    margin-left: 500px;
+    text-align: center;
+    height: 300px;
+    width: 500px;
+}
+
+#flexSwitchCheckDefault {
+    width: 40px;
+    height: 20px;
+    margin-left: 210px;
+}
+
+@font-face {
+    font-family: "about";
+    src: url(assets/fonts/ShadowsIntoLight-Regular.ttf);
+}
+
+#about-image {
+    height: 200px;
+    width: 200px;
+}
+
+.about-par {
+    font-family: "about";
+    font-size: xx-large;
+    color: white
+}
