@@ -7,10 +7,11 @@ h1 {
     font-family: "title";
     font-size: 100px;
     text-align: center;
-    color: dodgerblue
+    color: dodgerblue;
 }
 
 body {
+    padding: 0;
     margin: 0;
     background-image: url(assets/images/main-background.jpg);
     background-repeat: no-repeat;
@@ -20,6 +21,10 @@ body {
 #reportSection,
 #aboutSection {
     display: none;
+    color: white;
+}
+
+#homeSection {
     color: white;
 }
 
@@ -52,8 +57,7 @@ body {
 #progressBar {
     margin-left: 500px;
     text-align: center;
-    height: 300px;
-    width: 500px;
+    max-width: 50px;
 }
 
 #flexSwitchCheckDefault {
@@ -76,4 +80,11 @@ body {
     font-family: "about";
     font-size: xx-large;
     color: white
+}
+
+.parallax-wrapper {
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    perspective: 300px;
 }

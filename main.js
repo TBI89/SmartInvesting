@@ -11,7 +11,8 @@ $(() => {
         // Pill UI:
         $("a.nav-link").removeClass("active");
         $(this).addClass("active");
-        //    Display progress bar (ENABLE AFTER ALL SECTIONS ARE SET!):
+
+        // Display progress bar  (ENABLE WHEN ALL SECTIONS ARE SET)
         // $("#progressBar").html('<img src="assets/images/progress-bar.gif"></img>');
 
         // Display current section:
@@ -34,6 +35,13 @@ $(() => {
             coin.symbol.toLowerCase().includes(query.toLowerCase())
         );
         displayCoins(searchResult);
+    }
+
+    // Fetch coin data from the given url:
+    async function getJson(url) {
+        const response = await fetch(url);
+        const json = await response.json();
+        return json;
     }
 
     // Display the first 100 items on the page:
@@ -70,8 +78,38 @@ $(() => {
           `;
         }
         $("#coinsContainer").html(html);
-        $("#progressBar").css("display: none;");
     }
+
+    // Empty array to store tracked coins
+    let trackedCoins = [];
+
+    // Track coins using the toggle button:
+    $("#coinsContainer").on("click", ".form-check-input", function () {
+        const isChecked = $(this).prop("checked");
+        const coinId = $(this).closest(".card").find(".btn").attr("id").replace("button_", "");
+
+        const maxLimit = 5;
+
+        //   Validation for turn on the toggle for 5 coins max:
+        if (isChecked) { //***GO BACK AND COMPLETE A DIALOG***
+            if (trackedCoins.length >= maxLimit) { // on the 6th press: disable the toggle button & show an alert
+                $(this).prop("checked", false);
+                alert("To add another coin, please remove 1 from the above:");
+            }
+            else {
+                trackedCoins.push(coinId);
+                console.log(`Toggle button for coin ${coinId} is ON`);
+            }
+        }
+        else {
+            // Remove the coin ID from the tracked coins array
+            const index = trackedCoins.indexOf(coinId);
+            if (index !== -1) {
+                trackedCoins.splice(index, 1);
+            }
+            console.log(`Toggle button for coin ${coinId} is OFF`);
+        }
+    });
 
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {
@@ -104,13 +142,29 @@ $(() => {
         ILS:₪ ${ils}
         `;
         $(`#collapse_${coinId}`).children().html(moreInfo);
+
+        const coinInfo = {
+            imageSource: imageSource,
+            usd: usd,
+            eur: eur,
+            ils: ils
+        };
+
+        addToLocalStorage(coinId, coinInfo); // Add the "More Info" data to local storage
     }
 
-    // Fetch coin data from the given url:
-    async function getJson(url) {
-        const response = await fetch(url);
-        const json = await response.json();
-        return json;
+    function addToLocalStorage(coinId, coinInfo) {
+        const saveData = localStorage.getItem(coinId);
+        if (saveData) { // Check if coin ID already exist
+            console.log(`${coinId} already exist in local storage.`); //If yes: just send a message
+        }
+        else {
+            localStorage.setItem(coinId, JSON.stringify(coinInfo)); // Else: send a message & add to storage
+            console.log(`${coinId} added to local storage.`);
+        }
+        setTimeout(() => {
+            localStorage.removeItem(coinId);
+            console.log(`${coinId} was removed from local storage`); // Remove all data after 2 minutes
+        }, 120000);
     }
-
 });
