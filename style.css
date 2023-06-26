@@ -88,3 +88,7 @@ body {
     overflow-y: auto;
     perspective: 300px;
 }
+
+/* #dialogDiv {
+    display: none;
+} */

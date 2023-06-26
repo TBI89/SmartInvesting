@@ -96,7 +96,7 @@ $(() => {
                 $(this).prop("checked", false);
                 let html =
                     `
-               <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static">
+                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static">
                <div class="modal-dialog">
                    <div class="modal-content">
                        <div class="modal-header">
@@ -111,22 +111,10 @@ $(() => {
                        </div>
                    </div>
                </div>
-           </div>
+               </div>
                `;
                 $("#dialogDiv").html(html);
                 $("#staticBackdrop").modal("show"); // Display the dialog
-
-                // ***FIX THE DIALOG NOT BEING HIDDEN ON CLICK
-
-                // First attempt:
-                // $("document").on("click", "#close-button", function () {// Close the dialog when the user clicks "Done"
-                //     $("#staticBackdrop").modal("hide");
-                // });
-
-                // Second attempt:
-                // $("#close-button").click(() => {
-                //     $("#staticBackdrop").modal("hide");
-                // });  
             }
             else {
                 trackedCoins.push(coinId);
@@ -141,6 +129,12 @@ $(() => {
             }
             console.log(`Toggle button for coin ${coinId} is OFF`);
         }
+    });
+
+    // Remove dialog when the user clicks "Done"
+    $("#dialogDiv").on("click", "#close-button",  function () { // ***FIX***
+        $("#staticBackdrop").modal("hide");
+        console.log("clicked");
     });
 
     // On click (More info button) display the first 3 letters of each coin:
@@ -199,4 +193,5 @@ $(() => {
             console.log(`${coinId} was removed from local storage`); // Remove all data after 2 minutes
         }, 120000);
     }
+
 });
