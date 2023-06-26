@@ -91,10 +91,42 @@ $(() => {
         const maxLimit = 5;
 
         //   Validation for turn on the toggle for 5 coins max:
-        if (isChecked) { //***GO BACK AND COMPLETE A DIALOG***
-            if (trackedCoins.length >= maxLimit) { // on the 6th press: disable the toggle button & show an alert
+        if (isChecked) {
+            if (trackedCoins.length >= maxLimit) { // on the 6th press: disable the toggle button & open bootstrap dialog
                 $(this).prop("checked", false);
-                alert("To add another coin, please remove 1 from the above:");
+                let html =
+                    `
+               <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static">
+               <div class="modal-dialog">
+                   <div class="modal-content">
+                       <div class="modal-header">
+                           <h1 class="modal-title fs-5" id="staticBackdropLabel">Max Tracking Limit</h1>
+                           <button type="button" class="btn-close"></button>
+                       </div>
+                       <div class="modal-body">
+                           To add a new coin, please remove one of your correct coins:
+                       </div>
+                       <div class="modal-footer">
+                           <button type="button" class="btn btn-secondary" id="close-button">Done</button>
+                       </div>
+                   </div>
+               </div>
+           </div>
+               `;
+                $("#dialogDiv").html(html);
+                $("#staticBackdrop").modal("show"); // Display the dialog
+
+                // ***FIX THE DIALOG NOT BEING HIDDEN ON CLICK
+
+                // First attempt:
+                // $("document").on("click", "#close-button", function () {// Close the dialog when the user clicks "Done"
+                //     $("#staticBackdrop").modal("hide");
+                // });
+
+                // Second attempt:
+                // $("#close-button").click(() => {
+                //     $("#staticBackdrop").modal("hide");
+                // });  
             }
             else {
                 trackedCoins.push(coinId);
