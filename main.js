@@ -4,6 +4,9 @@
 
 $(() => {
 
+    // Display progress bar when the page is loading
+    $("#progressBar").html('<img src="assets/images/progress-bar.gif"></img>');  // ***ADD THE FUNCTION TO REMOVE WHEN THE PAGE IS LOADED***
+
     // Display the first 100 coins each time the page is loaded:
     handleHome();
 
@@ -11,9 +14,6 @@ $(() => {
         // Pill UI:
         $("a.nav-link").removeClass("active");
         $(this).addClass("active");
-
-        // Display progress bar  (ENABLE WHEN ALL SECTIONS ARE SET)
-        // $("#progressBar").html('<img src="assets/images/progress-bar.gif"></img>');
 
         // Display current section:
         const sectionId = $(this).attr("data-section");
@@ -96,25 +96,27 @@ $(() => {
                 $(this).prop("checked", false);
                 let html =
                     `
-                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static">
-               <div class="modal-dialog">
-                   <div class="modal-content">
-                       <div class="modal-header">
-                           <h1 class="modal-title fs-5" id="staticBackdropLabel">Max Tracking Limit</h1>
-                           <button type="button" class="btn-close"></button>
-                       </div>
-                       <div class="modal-body">
-                           To add a new coin, please remove one of your correct coins:
-                       </div>
-                       <div class="modal-footer">
-                           <button type="button" class="btn btn-secondary" id="close-button">Done</button>
-                       </div>
-                   </div>
-               </div>
-               </div>
+                    <div id="dialogMsg" class="modal" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Max Coin Limit</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <p>To add a new coin, please remove one of your current coins:</p>
+                        </div>
+                        <div class="modal-footer">
+                          <button id="close-button" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                `;
                 $("#dialogDiv").html(html);
-                $("#staticBackdrop").modal("show"); // Display the dialog
+                $("#dialogMsg").modal("show"); // Display the dialog
+
             }
             else {
                 trackedCoins.push(coinId);
@@ -129,13 +131,14 @@ $(() => {
             }
             console.log(`Toggle button for coin ${coinId} is OFF`);
         }
+
     });
 
-    // Remove dialog when the user clicks "Done"
-    $("#dialogDiv").on("click", "#close-button",  function () { // ***FIX***
-        $("#staticBackdrop").modal("hide");
-        console.log("clicked");
-    });
+    // Hide the dialog (when the user clicks "Close")
+    $("#dialogDiv").on("click", "#close-button", (() => { // ***FIX***
+        $("#dialogMsg").modal("hide");
+        console.log("Click!");
+    }));
 
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {
@@ -145,7 +148,6 @@ $(() => {
 
     $("#homeLink").click(async () => await handleHome());
     $("#reportsLink").click(() => { });
-    $("#aboutLink").click(() => { });
 
     async function handleHome() {
         const coins = await getJson("coins.json");

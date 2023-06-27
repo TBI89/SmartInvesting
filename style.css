@@ -1,4 +1,5 @@
-@font-face {
+/* Unique font for the title */
+@font-face { 
     font-family: "title";
     src: url(assets/fonts/TiltPrism-Regular-VariableFont_XROT\,YROT.ttf);
 }
@@ -8,6 +9,8 @@ h1 {
     font-size: 100px;
     text-align: center;
     color: dodgerblue;
+    padding-right: 150px;
+    padding-bottom: 30px;
 }
 
 body {
@@ -26,6 +29,8 @@ body {
 
 #homeSection {
     color: white;
+    margin-left: 20px;
+
 }
 
 #searchButton {
@@ -55,9 +60,8 @@ body {
 }
 
 #progressBar {
-    margin-left: 500px;
-    text-align: center;
-    max-width: 50px;
+    height: 1px;
+    margin-left: 1200px;
 }
 
 #flexSwitchCheckDefault {
@@ -82,13 +86,10 @@ body {
     color: white
 }
 
+/* Display parallax scrolling */
 .parallax-wrapper {
     height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
     perspective: 300px;
 }
-
-/* #dialogDiv {
-    display: none;
-} */
