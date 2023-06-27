@@ -89,65 +89,85 @@ $(() => {
         hideProgressBar(); // Remove the progress bar when the coins are displayed
     }
 
-    // Empty array to store tracked coins
-    let trackedCoins = [];
+ // Empty array to store tracked coins
+let trackedCoins = [];
 
-    // Track coins using the toggle button:
-    $("#coinsContainer").on("click", ".form-check-input", function () {
-        const isChecked = $(this).prop("checked");
-        const coinId = $(this).closest(".card").find(".btn").attr("id").replace("button_", "");
+// Track coins using the toggle button:
+$("#coinsContainer").on("click", ".form-check-input", function () {
+  const isChecked = $(this).prop("checked");
+  const coinId = $(this).closest(".card").find(".btn").attr("id").replace("button_", "");
 
-        const maxLimit = 5;
+  const maxLimit = 5;
 
-        //   Validation for turn on the toggle for 5 coins max:
-        if (isChecked) {
-            if (trackedCoins.length >= maxLimit) { // on the 6th press: disable the toggle button & open bootstrap dialog
-                $(this).prop("checked", false);
-                let html =
-                    `
-                    <div id="dialogMsg" class="modal" tabindex="-1">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title">Max Coin Limit</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <p>To add a new coin, please remove one of your current coins:</p>
-                        </div>
-                        <div class="modal-footer">
-                          <button id="close-button" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="button" class="btn btn-primary">Save changes</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-               `;
-                $("#dialogDiv").html(html);
-                $("#dialogMsg").modal("show"); // Display the dialog
+  // Validation for turning on the toggle for 5 coins max:
+  if (isChecked) {
+    if (trackedCoins.length >= maxLimit) {
+      // On the 6th press: disable the toggle button & open bootstrap dialog
+      $(this).prop("checked", false);
+      let html = `
+        <div id="dialogMsg" class="modal" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Max Coin Limit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>To add a new coin, please remove one of your current coins:</p>
+                <div id="trackedCoinsContainer"></div>
+              </div>
+              <div class="modal-footer">
+                <button id="close-button" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      $("body").append(html);
+      $("#dialogMsg").modal("show"); // Display the dialog
+      displayCoinsTracked(trackedCoins);
+    } else {
+      const toggledCoin = findCoinById(coinId);
+      if (toggledCoin) {
+        trackedCoins.push(toggledCoin);
+        console.log(`Toggle button for coin ${coinId} is ON`);
+      }
+    }
+  } else {
+    // Remove the coin from the tracked coins array
+    const index = trackedCoins.findIndex((coin) => coin.id === coinId);
+    if (index !== -1) {
+      trackedCoins.splice(index, 1);
+    }
+    console.log(`Toggle button for coin ${coinId} is OFF`);
+  }
+});
 
-            }
-            else {
-                trackedCoins.push(coinId);
-                console.log(`Toggle button for coin ${coinId} is ON`);
-            }
-        }
-        else {
-            // Remove the coin ID from the tracked coins array
-            const index = trackedCoins.indexOf(coinId);
-            if (index !== -1) {
-                trackedCoins.splice(index, 1);
-            }
-            console.log(`Toggle button for coin ${coinId} is OFF`);
-        }
+// Find coin by id:
+async function findCoinById(coinId) {
+  const coins = await getJson("coins.json");
+  return coins.find((coin) => coin.id === coinId);
+}
 
-    });
+// Display the coins tracked in the dialog:
+function displayCoinsTracked(trackedCoins) {
+  let html = "";
+  for (let i = 0; i < trackedCoins.length; i++) {
+    html += `
+      <div class="card" style="width: 18rem; height: 20rem; overflow: auto;">
+        <!-- Card content -->
+      </div>
+    `;
+  }
+  $("#trackedCoinsContainer").html(html); // Update the content of trackedCoinsContainer
+}
 
-    // Hide the dialog (when the user clicks "Close")
-    $("#dialogDiv").on("click", "#close-button", (() => { // ***FIX***
-        $("#dialogMsg").modal("hide");
-        console.log("Click!");
-    }));
+// Hide the dialog (when the user clicks "Close"):
+$("body").on("click", "#close-button", () => {
+  $("#dialogMsg").modal("hide");
+});
+
 
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {
