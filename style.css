@@ -1,5 +1,5 @@
 /* Unique font for the title */
-@font-face { 
+@font-face {
     font-family: "title";
     src: url(assets/fonts/TiltPrism-Regular-VariableFont_XROT\,YROT.ttf);
 }
@@ -52,8 +52,9 @@ body {
 
 .card {
     display: inline-block;
-    background-image: linear-gradient(45deg, dodgerblue, lightBlue);
+    background-color: rgba(30, 144, 255, 0.6);
 }
+
 
 .nav-link {
     color: white;
@@ -61,7 +62,13 @@ body {
 
 #progressBar {
     height: 1px;
-    margin-left: 1200px;
+    margin-left: 600px;
+}
+
+#loadingImg {
+    height: 50px;
+    margin-top: 150px;
+    margin-left: 100px;
 }
 
 #flexSwitchCheckDefault {

@@ -4,11 +4,17 @@
 
 $(() => {
 
-    // Display progress bar when the page is loading
-    $("#progressBar").html('<img src="assets/images/progress-bar.gif"></img>');  // ***ADD THE FUNCTION TO REMOVE WHEN THE PAGE IS LOADED***
-
     // Display the first 100 coins each time the page is loaded:
     handleHome();
+
+    // Show the progress bar when the page is loading:
+    function showProgressBar() {
+        $("#progressBar").show();
+    }
+    // Hide the progress bar when the page is loaded:
+    function hideProgressBar() {
+        $("#progressBar").hide();
+    }
 
     $("a.nav-link").click(function () {
         // Pill UI:
@@ -19,6 +25,7 @@ $(() => {
         const sectionId = $(this).attr("data-section");
         $("section").hide();
         $("#" + sectionId).show();
+        showProgressBar();
     });
 
     // Handle user searches:
@@ -26,6 +33,7 @@ $(() => {
         event.preventDefault();
         const searchInput = $("#searchInput").val();
         await searchCoins(searchInput);
+        showProgressBar(); // Display progress bar when the page is loading...
     });
 
     // Fetch coins data, filter coins & display results:
@@ -78,6 +86,7 @@ $(() => {
           `;
         }
         $("#coinsContainer").html(html);
+        hideProgressBar(); // Remove the progress bar when the coins are displayed
     }
 
     // Empty array to store tracked coins
@@ -148,6 +157,7 @@ $(() => {
 
     $("#homeLink").click(async () => await handleHome());
     $("#reportsLink").click(() => { });
+    $("#aboutLink").click(() => { });
 
     async function handleHome() {
         const coins = await getJson("coins.json");
