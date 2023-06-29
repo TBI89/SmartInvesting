@@ -128,7 +128,7 @@ $(() => {
                 $("#dialogMsg").modal("show"); // Display the dialog
                 displayCoinsTracked(trackedCoins);
 
-            } 
+            }
             else {
 
                 // Used to display the data of "trackedCoins" array in the dialog:
@@ -142,7 +142,7 @@ $(() => {
                     console.error(error);
                 });
             }
-        } 
+        }
         else {
 
             // Remove the coin from the tracked coins array
@@ -181,10 +181,13 @@ $(() => {
     }
 
     // Remove Coin from the "trackedCoins" array & close the when the user clicks "Remove":
-    $("body").on("click", "#remove-coin", function ()  {
-        trackedCoins.pop(this); // ***USE A DIFFERENT METHOD
+    $("body").on("click", "#remove-coin", function () {
+        const coinId = $(this).closest(".card").find(".btn").attr("id").replace("button_", "");
+        const index = trackedCoins.findIndex(coin => coin.id = coinId);
+        $(this).prop("checked", false);
+        trackedCoins.splice(index, 1);
+        console.log(trackedCoins);
         $("#dialogMsg").modal("hide");
-        console.log(trackedCoins); 
     });
 
     // On click (More info button) display the first 3 letters of each coin:
