@@ -89,7 +89,7 @@ $(() => {
         hideProgressBar(); // Remove the progress bar when the coins are displayed
     }
 
-    // Empty array to store tracked coins
+    // Empty array to store tracked coins:
     let trackedCoins = [];
 
     // Track coins using the toggle button:
@@ -118,7 +118,7 @@ $(() => {
                                 <div id="trackedCoinsContainer"></div>
                             </div>
                             <div class="modal-footer">
-                                <button id="close-button" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button id="close-button" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </div>
                     </div>
@@ -180,12 +180,13 @@ $(() => {
         $("#trackedCoinsContainer").html(html); // Update the content of trackedCoinsContainer
     }
 
-    // Remove Coin from the "trackedCoins" array & close the when the user clicks "Remove":
+    // Remove Coin from the "trackedCoins" array & close dialog when the user clicks "Remove":
     $("body").on("click", "#remove-coin", function () {
         const coinId = $(this).closest(".card").find(".btn").attr("id").replace("button_", "");
         const index = trackedCoins.findIndex(coin => coin.id = coinId);
-        $(this).prop("checked", false);
+        const checkedCoin = $(`#flexSwitchCheckDefault`).prop("checked", true);
         trackedCoins.splice(index, 1);
+        checkedCoin.prop("checked", false); // Uncheck the specific coin on the currencies section [***FIX***]
         console.log(trackedCoins);
         $("#dialogMsg").modal("hide");
     });
