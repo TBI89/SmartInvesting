@@ -64,7 +64,7 @@ $(() => {
         for (let i = 0; i < Math.min(coins.length, 100); i++) {
             html += `<div class="card" style="width: 18rem; height: 20rem; overflow: auto;">
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault_${coins[i].id}">
               <label class="form-check-label" for="flexSwitchCheckDefault"></label>
             </div>
             <div class="card-body">
@@ -170,7 +170,7 @@ $(() => {
               <div class="card-body">
                 <h5 class="card-title">${trackedCoins[i].symbol}</h5>
                 <p class="card-text">${trackedCoins[i].name}</p> 
-                <button id="remove-coin" class="btn btn-primary" type="button">
+                <button class="btn btn-primary remove-coin" type="button" data-coin-id="${trackedCoins[i].id}">
                   Remove
                 </button>
                     </div>
@@ -181,15 +181,23 @@ $(() => {
     }
 
     // Remove Coin from the "trackedCoins" array & close dialog when the user clicks "Remove":
-    $("body").on("click", "#remove-coin", function () {
-        const coinId = $(this).closest(".card").find(".btn").attr("id").replace("button_", "");
-        const index = trackedCoins.findIndex(coin => coin.id = coinId);
-        const checkedCoin = $(`#flexSwitchCheckDefault`).prop("checked", true);
-        trackedCoins.splice(index, 1);
-        checkedCoin.prop("checked", false); // Uncheck the specific coin on the currencies section [***FIX***]
-        console.log(trackedCoins);
+    $("body").on("click", ".remove-coin", function () {
+        const coinId = $(this).data("coin-id");
+        const index = trackedCoins.findIndex(coin => coin.id === coinId);
+        if (index !== -1) {
+            trackedCoins.splice(index, 1);
+            const checkedCoin = $(`#flexSwitchCheckDefault_${coinId}`);
+            if (checkedCoin.length) {
+                checkedCoin.prop("checked", false); // Uncheck the specific coin on the currencies section
+            }
+            console.log(`Coin ${coinId} has been removed from 'trackedCoins'`);
+        } else {
+            console.log(`Coin ${coinId} not found in 'trackedCoins'`);
+        }
         $("#dialogMsg").modal("hide");
+        console.log(trackedCoins);
     });
+    
 
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {
