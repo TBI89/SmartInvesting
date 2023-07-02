@@ -89,8 +89,9 @@ $(() => {
         hideProgressBar(); // Remove the progress bar when the coins are displayed
     }
 
-    // Empty array to store tracked coins:
-    let trackedCoins = [];
+
+    let trackedCoins = []; // Empty array to store tracked coins
+    let selectedCoinIndex = -1; //Store the 6th coin's index
 
     // Track coins using the toggle button:
     $("#coinsContainer").on("click", ".form-check-input", function () {
@@ -102,8 +103,10 @@ $(() => {
         // Validation for turning on the toggle for 5 coins max:
         if (isChecked) {
             if (trackedCoins.length >= maxLimit) {
-                // On the 6th press: disable the toggle button & open bootstrap dialog
-                $(this).prop("checked", false);
+                $(this).prop("checked", false); // On the 6th press: disable the toggle button & open bootstrap dialog
+                if (trackedCoins.length < maxLimit) {
+                    selectedCoinIndex = coinId;
+                }
                 let html =
                     `
                 <div id="dialogMsg" class="modal" tabindex="-1">
@@ -127,7 +130,6 @@ $(() => {
                 $("body").append(html);
                 $("#dialogMsg").modal("show"); // Display the dialog
                 displayCoinsTracked(trackedCoins);
-
             }
             else {
 
@@ -180,7 +182,7 @@ $(() => {
         $("#trackedCoinsContainer").html(html); // Update the content of trackedCoinsContainer
     }
 
-    // Remove Coin from the "trackedCoins" array & close dialog when the user clicks "Remove":
+    // Remove coin from the "trackedCoins" array & close dialog when the user clicks "Remove":
     $("body").on("click", ".remove-coin", function () {
         const coinId = $(this).data("coin-id");
         const index = trackedCoins.findIndex(coin => coin.id === coinId);
@@ -197,7 +199,20 @@ $(() => {
         $("#dialogMsg").modal("hide");
         console.log(trackedCoins);
     });
-    
+
+
+    // Add the 6th coin to the "trackedCoins" arr & checked his switch: ***FIX***
+    $("body").on("hidden.bs.modal", "#dialogMsg", function () {
+        if (selectedCoinIndex !== -1) {
+            const coinId = trackedCoins[selectedCoinIndex];
+            const toggleButton = $(`#flexSwitchCheckDefault_${coinId}`);
+            if (toggleButton.length) {
+                toggleButton.prop("checked", true); // Check the specific coin on the currencies section
+            }
+            selectedCoinIndex = -1;
+        }
+        console.log("Coin " + selectedCoinIndex + " was added to 'trackedCoins");
+    });
 
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {

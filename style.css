@@ -71,9 +71,9 @@ body {
     margin-left: 100px;
 }
 
-#flexSwitchCheckDefault {
-    width: 40px;
+.form-check-input {
     height: 20px;
+    min-width: 40px;
     margin-left: 210px;
 }
 
