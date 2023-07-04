@@ -4,6 +4,9 @@
 
 $(() => {
 
+    // keep the switch checked for the items in "trackedCoins":
+    // loadTrackedCoinsFromStorage(); ***ENABLE WHEN THE FUNCTION IS COMPLETED***
+
     // Display the first 100 coins each time the page is loaded:
     handleHome();
 
@@ -136,8 +139,8 @@ $(() => {
                         trackedCoins.push(toggledCoin);
                         console.log(`Toggle button for coin ${coinId} is ON`);
                         displayCoinsTracked(trackedCoins);
-                        addToLongTermStorage(coinId, trackedCoins);
-                        console.log(`Coin ${coinId} was added to long term storage`);
+                        addToLocalStorage(coinId, trackedCoins);
+                        console.log(`Coin ${coinId} was added to local storage`);
                     }
                 }).catch(function (error) {
                     console.error(error);
@@ -153,7 +156,7 @@ $(() => {
             }
             console.log(`Toggle button for coin ${coinId} is OFF`);
             removeFromLongTermStorage(coinId);
-            console.log(`Coin ${coinId} was deleted from long term storage`);
+            console.log(`Coin ${coinId} was deleted from local storage`);
             displayCoinsTracked(trackedCoins);
         }
     });
@@ -190,7 +193,7 @@ $(() => {
         if (index !== -1) {
             trackedCoins.splice(index, 1);
             removeFromLongTermStorage(coinId);
-            console.log(`Coin ${coinId} was deleted from long term storage`);
+            console.log(`Coin ${coinId} was deleted from local storage`);
             const checkedCoin = $(`#flexSwitchCheckDefault_${coinId}`);
             if (checkedCoin.length) {
                 checkedCoin.prop("checked", false); // Uncheck the specific coin on the currencies section
@@ -212,22 +215,31 @@ $(() => {
         console.log("Coin " + selectedCoinIndex + " was added to 'trackedCoins");
     });
 
-    // Add the tracked coins to long term storage (don't delete after 2 minuets):
-    function addToLongTermStorage(coinId, trackedCoins) {
+    // Add the tracked coins to local storage (don't delete after 2 minuets):
+    function addToLocalStorage(coinId, trackedCoins) {
         localStorage.getItem(coinId);
         localStorage.setItem(coinId, JSON.stringify(trackedCoins));
     }
 
-    // Remove coins that the user stopped tracking from long term storage:
+    // Remove coins that the user stopped tracking from local storage:
     function removeFromLongTermStorage(coinId) {
         localStorage.removeItem(coinId);
     }
 
     // Keep the switch checked for "trackedCoins" when the page is refreshed: ***COMPLETE***
-    $("coinsContainer").on("load", coinId => {
-        const toggleButton = $(`#flexSwitchCheckDefault_${coinId}`);
-        toggleButton.prop("checked", true);
-    });
+    function loadTrackedCoinsFromStorage() {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          const trackedCoins = JSON.parse(localStorage.getItem(key));
+          if (Array.isArray(trackedCoins) && trackedCoins.length > 0) {
+            trackedCoins.forEach(coinId => {
+              const toggleButton = $(`#flexSwitchCheckDefault_${coinId}`);
+              toggleButton.prop("checked", true);
+            });
+          }
+        }
+      }
+      
 
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {
@@ -268,22 +280,22 @@ $(() => {
             ils: ils
         };
 
-        addToShortTermStorage(coinId, coinInfo);
+        addToSessionStorage(coinId, coinInfo);
     }
 
-    // Add the "More Info" data to local storage:
-    function addToShortTermStorage(coinId, coinInfo) {
-        const saveData = localStorage.getItem(coinId);
+    // Add the "More Info" data to local *session* storage:
+    function addToSessionStorage(coinId, coinInfo) {
+        const saveData = sessionStorage.getItem(coinId);
         if (saveData) { // Check if coin ID already exist
-            console.log(`${coinId} already exist in short term storage.`); //If yes: just send a message
+            console.log(`${coinId} already exist in session storage.`); //If yes: just send a message
         }
         else {
-            localStorage.setItem(coinId, JSON.stringify(coinInfo)); // Else: send a message & add to storage
-            console.log(`${coinId} added to short term storage.`);
+            sessionStorage.setItem(coinId, JSON.stringify(coinInfo)); // Else: send a message & add to storage
+            console.log(`${coinId} added to session storage.`);
         }
         setTimeout(() => {
-            localStorage.removeItem(coinId);
-            console.log(`${coinId} was removed from short term storage`); // Remove all data after 2 minutes
+            sessionStorage.removeItem(coinId);
+            console.log(`${coinId} was removed from session storage`); // Remove all data after 2 minutes
         }, 120000);
     }
 
