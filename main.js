@@ -89,7 +89,6 @@ $(() => {
         hideProgressBar(); // Remove the progress bar when the coins are displayed
     }
 
-
     let trackedCoins = []; // Empty array to store tracked coins
     let selectedCoinIndex = -1; //Store the 6th coin's index
 
@@ -104,9 +103,7 @@ $(() => {
         if (isChecked) {
             if (trackedCoins.length >= maxLimit) {
                 $(this).prop("checked", false); // On the 6th press: disable the toggle button & open bootstrap dialog
-                if (trackedCoins.length < maxLimit) {
-                    selectedCoinIndex = coinId;
-                }
+                selectedCoinIndex = coinId;
                 let html =
                     `
                 <div id="dialogMsg" class="modal" tabindex="-1">
@@ -139,6 +136,8 @@ $(() => {
                         trackedCoins.push(toggledCoin);
                         console.log(`Toggle button for coin ${coinId} is ON`);
                         displayCoinsTracked(trackedCoins);
+                        addToLongTermStorage(coinId, trackedCoins);
+                        console.log(`Coin ${coinId} was added to long term storage`);
                     }
                 }).catch(function (error) {
                     console.error(error);
@@ -153,6 +152,8 @@ $(() => {
                 trackedCoins.splice(index, 1);
             }
             console.log(`Toggle button for coin ${coinId} is OFF`);
+            removeFromLongTermStorage(coinId);
+            console.log(`Coin ${coinId} was deleted from long term storage`);
             displayCoinsTracked(trackedCoins);
         }
     });
@@ -188,30 +189,44 @@ $(() => {
         const index = trackedCoins.findIndex(coin => coin.id === coinId);
         if (index !== -1) {
             trackedCoins.splice(index, 1);
+            removeFromLongTermStorage(coinId);
+            console.log(`Coin ${coinId} was deleted from long term storage`);
             const checkedCoin = $(`#flexSwitchCheckDefault_${coinId}`);
             if (checkedCoin.length) {
                 checkedCoin.prop("checked", false); // Uncheck the specific coin on the currencies section
             }
             console.log(`Coin ${coinId} has been removed from 'trackedCoins'`);
-        } else {
+        }
+        else {
             console.log(`Coin ${coinId} not found in 'trackedCoins'`);
         }
         $("#dialogMsg").modal("hide");
         console.log(trackedCoins);
     });
 
-
-    // Add the 6th coin to the "trackedCoins" arr & checked his switch: ***FIX***
+    // Add the new coin to "trackedCoins" arr & check his switch:
     $("body").on("hidden.bs.modal", "#dialogMsg", function () {
-        if (selectedCoinIndex !== -1) {
-            const coinId = trackedCoins[selectedCoinIndex];
-            const toggleButton = $(`#flexSwitchCheckDefault_${coinId}`);
-            if (toggleButton.length) {
-                toggleButton.prop("checked", true); // Check the specific coin on the currencies section
-            }
-            selectedCoinIndex = -1;
-        }
+        trackedCoins.push(selectedCoinIndex);
+        const toggleButton = $(`#flexSwitchCheckDefault_${selectedCoinIndex}`);
+        toggleButton.prop("checked", true); // Check the specific coin on the currencies section  
         console.log("Coin " + selectedCoinIndex + " was added to 'trackedCoins");
+    });
+
+    // Add the tracked coins to long term storage (don't delete after 2 minuets):
+    function addToLongTermStorage(coinId, trackedCoins) {
+        localStorage.getItem(coinId);
+        localStorage.setItem(coinId, JSON.stringify(trackedCoins));
+    }
+
+    // Remove coins that the user stopped tracking from long term storage:
+    function removeFromLongTermStorage(coinId) {
+        localStorage.removeItem(coinId);
+    }
+
+    // Keep the switch checked for "trackedCoins" when the page is refreshed: ***COMPLETE***
+    $("coinsContainer").on("load", coinId => {
+        const toggleButton = $(`#flexSwitchCheckDefault_${coinId}`);
+        toggleButton.prop("checked", true);
     });
 
     // On click (More info button) display the first 3 letters of each coin:
@@ -223,7 +238,6 @@ $(() => {
 
     $("#homeLink").click(async () => await handleHome());
     $("#reportsLink").click(() => { });
-    $("#aboutLink").click(() => { });
 
     async function handleHome() {
         const coins = await getJson("coins.json");
@@ -254,21 +268,22 @@ $(() => {
             ils: ils
         };
 
-        addToLocalStorage(coinId, coinInfo); // Add the "More Info" data to local storage
+        addToShortTermStorage(coinId, coinInfo);
     }
 
-    function addToLocalStorage(coinId, coinInfo) {
+    // Add the "More Info" data to local storage:
+    function addToShortTermStorage(coinId, coinInfo) {
         const saveData = localStorage.getItem(coinId);
         if (saveData) { // Check if coin ID already exist
-            console.log(`${coinId} already exist in local storage.`); //If yes: just send a message
+            console.log(`${coinId} already exist in short term storage.`); //If yes: just send a message
         }
         else {
             localStorage.setItem(coinId, JSON.stringify(coinInfo)); // Else: send a message & add to storage
-            console.log(`${coinId} added to local storage.`);
+            console.log(`${coinId} added to short term storage.`);
         }
         setTimeout(() => {
             localStorage.removeItem(coinId);
-            console.log(`${coinId} was removed from local storage`); // Remove all data after 2 minutes
+            console.log(`${coinId} was removed from short term storage`); // Remove all data after 2 minutes
         }, 120000);
     }
 
