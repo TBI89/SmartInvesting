@@ -4,9 +4,6 @@
 
 $(() => {
 
-    // keep the switch checked for the items in "trackedCoins":
-    // loadTrackedCoinsFromStorage(); ***ENABLE WHEN THE FUNCTION IS COMPLETED***
-
     // Display the first 100 coins each time the page is loaded:
     handleHome();
 
@@ -90,6 +87,7 @@ $(() => {
         }
         $("#coinsContainer").html(html);
         hideProgressBar(); // Remove the progress bar when the coins are displayed
+        keepCoinsChecked(); // keep the switch checked for the items in "trackedCoins"
     }
 
     let trackedCoins = []; // Empty array to store tracked coins
@@ -109,7 +107,7 @@ $(() => {
                 selectedCoinIndex = coinId;
                 let html =
                     `
-                <div id="dialogMsg" class="modal" tabindex="-1">
+                <div id="dialogMsg" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -172,7 +170,7 @@ $(() => {
         let html = "";
         for (let i = 0; i < trackedCoins.length; i++) {
             html += `
-            <div class="card" style="width: 18rem; height: 20rem; overflow: auto;">
+            <div id="modal-card" class="card" style="width: 18rem; height: 20rem; overflow: auto;">
               <div class="card-body">
                 <h5 class="card-title">${trackedCoins[i].symbol}</h5>
                 <p class="card-text">${trackedCoins[i].name}</p> 
@@ -204,15 +202,16 @@ $(() => {
             console.log(`Coin ${coinId} not found in 'trackedCoins'`);
         }
         $("#dialogMsg").modal("hide");
-        console.log(trackedCoins);
     });
 
     // Add the new coin to "trackedCoins" arr & check his switch:
-    $("body").on("hidden.bs.modal", "#dialogMsg", function () {
+    $("body").on("hidden.bs.modal", "#dialogMsg", () => {
         trackedCoins.push(selectedCoinIndex);
+        addToLocalStorage(selectedCoinIndex, trackedCoins);
         const toggleButton = $(`#flexSwitchCheckDefault_${selectedCoinIndex}`);
-        toggleButton.prop("checked", true); // Check the specific coin on the currencies section  
+        toggleButton.prop("checked", true); // Check the specific coin on the currencies section 
         console.log("Coin " + selectedCoinIndex + " was added to 'trackedCoins");
+        console.log(trackedCoins);
     });
 
     // Add the tracked coins to local storage (don't delete after 2 minuets):
@@ -226,20 +225,20 @@ $(() => {
         localStorage.removeItem(coinId);
     }
 
-    // Keep the switch checked for "trackedCoins" when the page is refreshed: ***COMPLETE***
-    function loadTrackedCoinsFromStorage() {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          const trackedCoins = JSON.parse(localStorage.getItem(key));
-          if (Array.isArray(trackedCoins) && trackedCoins.length > 0) {
-            trackedCoins.forEach(coinId => {
-              const toggleButton = $(`#flexSwitchCheckDefault_${coinId}`);
-              toggleButton.prop("checked", true);
-            });
-          }
+    function keepCoinsChecked() {
+        try {
+            if (Array.isArray(trackedCoins) && trackedCoins.length > 0) {
+                for (const coin of trackedCoins) {
+                    const toggleButton = $(`#flexSwitchCheckDefault_${trackedCoins[coin]}`);
+                    toggleButton.prop("checked", true);
+                    console.log(trackedCoins[coin]);
+                }
+            }
         }
-      }
-      
+        catch (err) {
+            console.log(err.message);
+        }
+    }
 
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {

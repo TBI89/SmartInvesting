@@ -100,3 +100,18 @@ body {
     overflow-y: auto;
     perspective: 300px;
 }
+
+.modal-dialog {
+    max-width: 1500px;
+    max-height: 1500px;
+}
+
+.modal-content {
+    background-image: linear-gradient(0deg, #233142, #0092ca, #ff9a3c);
+}
+
+#modal-card {
+    opacity: 0.75;
+}
+
+
