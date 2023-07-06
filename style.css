@@ -71,6 +71,10 @@ body {
     margin-left: 100px;
 }
 
+#loadingImg-collapse {
+    max-width: 30px;
+}
+
 .form-check-input {
     height: 20px;
     min-width: 40px;

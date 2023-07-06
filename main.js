@@ -33,7 +33,6 @@ $(() => {
         event.preventDefault();
         const searchInput = $("#searchInput").val();
         await searchCoins(searchInput);
-        showProgressBar(); // Display progress bar when the page is loading...
     });
 
     // Fetch coins data, filter coins & display results:
@@ -75,7 +74,7 @@ $(() => {
                 More info
               </button>
               <div style="min-height: 120px;">
-                <div class="collapse collapse-horizontal" id="collapse_${coins[i].id}">
+                <div class="collapse collapse-vertical w-100 p-3"  id="collapse_${coins[i].id}">
                   <div class="card card-body">
           
                   </div>
@@ -87,7 +86,6 @@ $(() => {
         }
         $("#coinsContainer").html(html);
         hideProgressBar(); // Remove the progress bar when the coins are displayed
-        keepCoinsChecked(); // keep the switch checked for the items in "trackedCoins"
     }
 
     let trackedCoins = []; // Empty array to store tracked coins
@@ -225,30 +223,15 @@ $(() => {
         localStorage.removeItem(coinId);
     }
 
-    function keepCoinsChecked() {
-        try {
-            if (Array.isArray(trackedCoins) && trackedCoins.length > 0) {
-                for (const coin of trackedCoins) {
-                    const toggleButton = $(`#flexSwitchCheckDefault_${trackedCoins[coin]}`);
-                    toggleButton.prop("checked", true);
-                    console.log(trackedCoins[coin]);
-                }
-            }
-        }
-        catch (err) {
-            console.log(err.message);
-        }
-    }
-
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {
         const coinId = $(this).attr("id").substring(7);
         await handleMoreInfo(coinId);
-        showProgressBar();
     });
 
     $("#homeLink").click(async () => await handleHome());
     $("#reportsLink").click(() => { });
+    $("#aboutLink").click(() => hideProgressBar()); // Remove progress bar when about page is loaded.
 
     async function handleHome() {
         const coins = await getJson("coins.json");
@@ -264,11 +247,12 @@ $(() => {
         const eur = coin.market_data.current_price.eur;
         const ils = coin.market_data.current_price.ils;
         const moreInfo = `
-    <div class="price-info">
+  <div class="price-info">
         <img src="${imageSource}"> <br>
         USD $${usd}<br>
         EUR:€ ${eur}<br>
         ILS:₪ ${ils}
+    </div>
         `;
         $(`#collapse_${coinId}`).children().html(moreInfo);
 
