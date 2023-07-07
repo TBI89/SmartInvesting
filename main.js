@@ -38,8 +38,8 @@ $(() => {
     // Fetch coins data, filter coins & display results:
     async function searchCoins(query) {
         const coins = await getJson("coins.json");
-        const searchResult = coins.filter((coin) =>
-            coin.symbol.toLowerCase().includes(query.toLowerCase())
+        const searchResult = coins.filter(coin =>
+            coin.symbol.toLowerCase() === (query.toLowerCase()) // Result will display only if the user enters the whole symbol name
         );
         displayCoins(searchResult);
     }
