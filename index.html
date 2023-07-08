@@ -18,68 +18,74 @@
 
 <body>
 
-    <div class="parallax-wrapper">
+    <section class="container-fluid">
 
-        <div id="progressBar">
-            <img id="loadingImg" src="assets/images/progress-bar-test.gif">
+        <div class="parallax-wrapper">
+
+            <div id="progressBar">
+                <img id="loadingImg" src="assets/images/progress-bar-test.gif">
+            </div>
+
+            <div class="row">
+                <h1 class="col-xs-8 col-sm-4 col-md-2 col-lg-2 col-xl-2">Oun Your Future!</h1>
+            </div>
+
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a id="homeLink" class="nav-link active" data-section="homeSection">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a id="reportsLink" class="nav-link" data-section="reportSection">Live Reports</a>
+                </li>
+                <li class="nav-item">
+                    <a id="aboutLink" class="nav-link" data-section="aboutSection">About</a>
+                </li>
+
+                <!-- Move under the nav on mobile view (*FIX*) -->
+                <form class="d-flex" role="search" id="form">
+                    <input class="form-control me-2" type="search" placeholder="Search" id="searchInput">
+                    <button id="searchButton" class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </ul>
+
+            <section id="homeSection">
+                <h2>Currencies</h2>
+                <div id="coinsContainer">
+                </div>
+            </section>
+
+            <section id="reportSection">
+                <h2>Reports</h2>
+            </section>
+
+            <section id="aboutSection">
+                <h2>About</h2>
+                <img src="assets/images/about-me.jpg" class="rounded-circle" id="about-image">
+                <p class="about-par">
+                    Hi, i'm Tomer! <br>
+                    In order to develop and design that site, I used mostly frontend technologies<br>
+                    (such as HTML, CSS, and JavaScript) and a couple of external libraries (Bootstrap and jQuery).
+                </p>
+                <p class="about-par">
+                    The crypto market has been on the rise in the last few years,<br>
+                    and the need for tracking trends in that market inspired me to create a site,<br>
+                    a place where enthusiasts can get:
+                </p>
+
+                <li class="about-par">
+                    Currencies of dozens of virtual coins in the crypto market.
+                </li>
+                <li class="about-par">
+                    Tracking options for specific coins based on your preferences.
+                </li>
+                <li class="about-par">
+                    A responsive UI for all devices!
+                </li>
+            </section>
+
         </div>
 
-        <h1>Oun Your Future!</h1>
-
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a id="homeLink" class="nav-link active" data-section="homeSection">Home</a>
-            </li>
-            <li class="nav-item">
-                <a id="reportsLink" class="nav-link" data-section="reportSection">Live Reports</a>
-            </li>
-            <li class="nav-item">
-                <a id="aboutLink" class="nav-link" data-section="aboutSection">About</a>
-            </li>
-
-            <form class="d-flex" role="search" id="form">
-                <input class="form-control me-2" type="search" placeholder="Search" id="searchInput">
-                <button id="searchButton" class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-        </ul>
-
-        <section id="homeSection">
-            <h2>Currencies</h2>
-            <div id="coinsContainer">
-            </div>
-        </section>
-
-        <section id="reportSection">
-            <h2>Reports</h2>
-        </section>
-
-        <section id="aboutSection">
-            <h2>About</h2>
-            <img src="assets/images/about-me.jpg" class="rounded-circle" id="about-image">
-            <p class="about-par">
-                Hi, i'm Tomer! <br>
-                In order to develop and design that site, I used mostly frontend technologies<br>
-                (such as HTML, CSS, and JavaScript) and a couple of external libraries (Bootstrap and jQuery).
-            </p>
-            <p class="about-par">
-                The crypto market has been on the rise in the last few years,<br>
-                and the need for tracking trends in that market inspired me to create a site,<br>
-                a place where enthusiasts can get:
-            </p>
-
-            <li class="about-par">
-                Currencies of dozens of virtual coins in the crypto market.
-            </li>
-            <li class="about-par">
-                Tracking options for specific coins based on your preferences.
-            </li>
-            <li class="about-par">
-                A responsive UI for all devices!
-            </li>
-        </section>
-
-
-    </div>
+    </section>
 
 </body>
 
