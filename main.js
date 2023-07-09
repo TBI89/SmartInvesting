@@ -223,6 +223,63 @@ $(() => {
         localStorage.removeItem(coinId);
     }
 
+    // Get data to display on the live reports:
+    async function handleLiveReports() { // ***FIX***
+        const trackedCoinResponse = await getJson(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${trackedCoins.map(c => c.symbol).join(',')}&tsyms=USD`);
+
+        const options = {
+            exportEnabled: true,
+            animationEnabled: true,
+            title: {
+                text: "Live Reports"
+            },
+            axisY: {
+                title: "Coin Value",
+                titleFontColor: "#4F81BC",
+                lineColor: "#4F81BC",
+                labelFontColor: "#4F81BC",
+                tickColor: "#4F81BC"
+            },
+            toolTip: {
+                shared: true
+            },
+            legend: {
+                cursor: "pointer",
+                itemclick: toggleDataSeries
+            },
+            data: [],
+        };
+
+        for (const coin of trackedCoins) {
+            const coinData = trackedCoinResponse[coin.symbol];
+            if (coinData) {
+                const value = coinData.USD;
+                const dataPoints = [{ x: new Date(), y: value }];
+                options.data.push({
+                    type: "spline",
+                    name: coin.symbol,
+                    showInLegend: true,
+                    xValueFormatString: "MMM YYYY",
+                    yValueFormatString: "#,##0 Units",
+                    dataPoints: dataPoints
+                });
+            }
+        }
+
+        console.log(trackedCoinResponse);
+
+        $("#chartContainer").CanvasJSChart(options);
+
+        function toggleDataSeries(e) {
+            if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            } else {
+                e.dataSeries.visible = true;
+            }
+            e.chart.render();
+        }
+    }
+
     // On click (More info button) display the first 3 letters of each coin:
     $("#coinsContainer").on("click", ".more-info", async function () {
         const coinId = $(this).attr("id").substring(7);
@@ -230,7 +287,7 @@ $(() => {
     });
 
     $("#homeLink").click(async () => await handleHome());
-    $("#reportsLink").click(() => { });
+    $("#reportsLink").click(async () => await handleLiveReports());
     $("#aboutLink").click(() => hideProgressBar()); // Remove progress bar when about page is loaded.
 
     async function handleHome() {
