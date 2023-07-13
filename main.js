@@ -232,16 +232,25 @@ $(() => {
         );
 
         try {
-            const dataSeries = [];
-            let coinData = 0;
-            for (const price in trackedCoinResponse) {
-                coinData += trackedCoinResponse[price].USD;
+            let coinData = []; // Store the the "trackedCoins" value (in USD) in an array.
+
+            for (const price in trackedCoinResponse) { // Extract the coin value
+                coinData.push(trackedCoinResponse[price].USD); // Add data to the "coinData" arr.
             }
+
+            const dataSeries = [];
 
             for (const coin of trackedCoins) {
                 const coinSymbol = coin.symbol;
                 if (coinData) {
-                    const dataPoints = [{ x: new Date(), y: coinData }];
+                    const dataPoints = [
+                        { x: new Date(), y: coinData[0] },
+                        { x: new Date(), y: coinData[1] },
+                        { x: new Date(), y: coinData[2] },
+                        { x: new Date(), y: coinData[3] },
+                        { x: new Date(), y: coinData[4] }
+
+                    ];
                     const dataSeriesItem = {
                         type: "spline",
                         name: coinSymbol,
@@ -277,8 +286,9 @@ $(() => {
                 },
                 data: dataSeries,
             };
-            
+
             $("#chartContainer").CanvasJSChart(options);
+            console.log(coinData);
         }
         catch (error) {
             console.error("Error fetching live reports data:" + error);
