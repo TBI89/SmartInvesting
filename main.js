@@ -224,54 +224,71 @@ $(() => {
     }
 
     // Get data to display on the live reports:
-    async function handleLiveReports() { // ***FIX***
-        const trackedCoinResponse = await getJson(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${trackedCoins.map(c => c.symbol).join(',')}&tsyms=USD`);
+    async function handleLiveReports() {
+        const trackedCoinResponse = await getJson(
+            `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${trackedCoins
+                .map(c => c.symbol)
+                .join(",")}&tsyms=USD`
+        );
 
-        const options = {
-            exportEnabled: true,
-            animationEnabled: true,
-            title: {
-                text: "Live Reports"
-            },
-            axisY: {
-                title: "Coin Value",
-                titleFontColor: "#4F81BC",
-                lineColor: "#4F81BC",
-                labelFontColor: "#4F81BC",
-                tickColor: "#4F81BC"
-            },
-            toolTip: {
-                shared: true
-            },
-            legend: {
-                cursor: "pointer",
-                itemclick: toggleDataSeries
-            },
-            data: [],
-        };
-
-        for (const coin of trackedCoins) {
-            const coinData = trackedCoinResponse[coin.symbol];
-            if (coinData) {
-                const value = coinData.USD;
-                const dataPoints = [{ x: new Date(), y: value }];
-                options.data.push({
-                    type: "spline",
-                    name: coin.symbol,
-                    showInLegend: true,
-                    xValueFormatString: "MMM YYYY",
-                    yValueFormatString: "#,##0 Units",
-                    dataPoints: dataPoints
-                });
+        try {
+            const dataSeries = [];
+            let coinData = 0;
+            for (const price in trackedCoinResponse) {
+                coinData += trackedCoinResponse[price].USD;
             }
+
+            for (const coin of trackedCoins) {
+                const coinSymbol = coin.symbol;
+                if (coinData) {
+                    const dataPoints = [{ x: new Date(), y: coinData }];
+                    const dataSeriesItem = {
+                        type: "spline",
+                        name: coinSymbol,
+                        showInLegend: true,
+                        xValueFormatString: "MMM YYYY",
+                        yValueFormatString: "$#,##0.00",
+                        dataPoints: dataPoints,
+                    };
+                    dataSeries.push(dataSeriesItem);
+                }
+            }
+
+            const options = {
+                exportEnabled: true,
+                animationEnabled: true,
+                title: {
+                    text: "Live Reports",
+                },
+                axisY: {
+                    title: "Coin Value (USD)",
+                    titleFontColor: "#4F81BC",
+                    lineColor: "#4F81BC",
+                    labelFontColor: "#4F81BC",
+                    tickColor: "#4F81BC",
+                },
+                toolTip: {
+                    shared: true,
+                    content: "{name}: ${y}",
+                },
+                legend: {
+                    cursor: "pointer",
+                    itemclick: toggleDataSeries,
+                },
+                data: dataSeries,
+            };
+            
+            $("#chartContainer").CanvasJSChart(options);
+        }
+        catch (error) {
+            console.error("Error fetching live reports data:" + error);
         }
 
-        console.log(trackedCoinResponse);
-
-        $("#chartContainer").CanvasJSChart(options);
-
         function toggleDataSeries(e) {
-            if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+            if (
+                typeof e.dataSeries.visible === "undefined" ||
+                e.dataSeries.visible
+            ) {
                 e.dataSeries.visible = false;
             } else {
                 e.dataSeries.visible = true;
