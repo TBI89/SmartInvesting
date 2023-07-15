@@ -232,13 +232,13 @@ $(() => {
         );
 
         try {
+
             let coinData = []; // Store the the "trackedCoins" value (in USD) in an array.
+            const dataSeries = [];
 
             for (const price in trackedCoinResponse) { // Extract the coin value
                 coinData.push(trackedCoinResponse[price].USD); // Add data to the "coinData" arr.
             }
-
-            const dataSeries = [];
 
             for (const coin of trackedCoins) {
                 const coinSymbol = coin.symbol;
@@ -255,8 +255,8 @@ $(() => {
                         type: "spline",
                         name: coinSymbol,
                         showInLegend: true,
-                        xValueFormatString: "MMM YYYY",
-                        yValueFormatString: "$#,##0.00",
+                        xValueFormatString: "HH:mm:ss",
+                        yValueFormatString: "#,##0.00",
                         dataPoints: dataPoints,
                     };
                     dataSeries.push(dataSeriesItem);
@@ -276,6 +276,9 @@ $(() => {
                     labelFontColor: "#4F81BC",
                     tickColor: "#4F81BC",
                 },
+                axisX: {
+                    valueFormatString: "HH:mm:ss",
+                },
                 toolTip: {
                     shared: true,
                     content: "{name}: ${y}",
@@ -288,7 +291,7 @@ $(() => {
             };
 
             $("#chartContainer").CanvasJSChart(options);
-            console.log(coinData);
+            console.log("Updated coin values:" + coinData);
         }
         catch (error) {
             console.error("Error fetching live reports data:" + error);
@@ -305,6 +308,7 @@ $(() => {
             }
             e.chart.render();
         }
+
     }
 
     // On click (More info button) display the first 3 letters of each coin:
@@ -314,7 +318,12 @@ $(() => {
     });
 
     $("#homeLink").click(async () => await handleHome());
-    $("#reportsLink").click(async () => await handleLiveReports());
+
+    $("#reportsLink").click(async () => {
+        await handleLiveReports();
+        setInterval(handleLiveReports, 2000); // Start updating the graph every 2 seconds
+    });
+
     $("#aboutLink").click(() => hideProgressBar()); // Remove progress bar when about page is loaded.
 
     async function handleHome() {
