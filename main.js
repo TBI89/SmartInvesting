@@ -223,6 +223,12 @@ $(() => {
         localStorage.removeItem(coinId);
     }
 
+    // Hold the reference for setInterval function:
+    let liveReportsInterval;
+
+    // Save old data points (to display on the graph):
+    const dataPointHistories = {};
+
     // Get data to display on the live reports:
     async function handleLiveReports() {
         const trackedCoinResponse = await getJson(
@@ -232,36 +238,27 @@ $(() => {
         );
 
         try {
+            const coinData = Object.values(trackedCoinResponse).map(coin => coin.USD);
 
-            let coinData = []; // Store the the "trackedCoins" value (in USD) in an array.
-            const dataSeries = [];
+            for (const coinSymbol in trackedCoinResponse) {
+                const coinValue = trackedCoinResponse[coinSymbol].USD;
+                const dataPoint = { x: new Date(), y: coinValue };
 
-            for (const price in trackedCoinResponse) { // Extract the coin value
-                coinData.push(trackedCoinResponse[price].USD); // Add data to the "coinData" arr.
-            }
-
-            for (const coin of trackedCoins) {
-                const coinSymbol = coin.symbol;
-                if (coinData) {
-                    const dataPoints = [
-                        { x: new Date(), y: coinData[0] },
-                        { x: new Date(), y: coinData[1] },
-                        { x: new Date(), y: coinData[2] },
-                        { x: new Date(), y: coinData[3] },
-                        { x: new Date(), y: coinData[4] }
-
-                    ];
-                    const dataSeriesItem = {
-                        type: "spline",
-                        name: coinSymbol,
-                        showInLegend: true,
-                        xValueFormatString: "HH:mm:ss",
-                        yValueFormatString: "#,##0.00",
-                        dataPoints: dataPoints,
-                    };
-                    dataSeries.push(dataSeriesItem);
+                if (!dataPointHistories[coinSymbol]) {
+                    dataPointHistories[coinSymbol] = []; // Create a new dataPointHistory array for the coin if it doesn't exist
                 }
+
+                dataPointHistories[coinSymbol].push(dataPoint); // Add the data point to the corresponding dataPointHistory array
             }
+
+            const dataSeries = Object.keys(dataPointHistories).map(coinSymbol => ({
+                type: "spline",
+                name: coinSymbol,
+                showInLegend: true,
+                xValueFormatString: "HH:mm:ss",
+                yValueFormatString: "#,##0.00",
+                dataPoints: dataPointHistories[coinSymbol] // Use the corresponding dataPointHistory array for each coin
+            }));
 
             const options = {
                 exportEnabled: true,
@@ -290,25 +287,34 @@ $(() => {
                 data: dataSeries,
             };
 
-            $("#chartContainer").CanvasJSChart(options);
-            console.log("Updated coin values:" + coinData);
-        }
-        catch (error) {
-            console.error("Error fetching live reports data:" + error);
-        }
-
-        function toggleDataSeries(e) {
-            if (
-                typeof e.dataSeries.visible === "undefined" ||
-                e.dataSeries.visible
-            ) {
-                e.dataSeries.visible = false;
-            } else {
-                e.dataSeries.visible = true;
+            if (trackedCoins.length > 0) {
+                $("#chartContainer").CanvasJSChart(options);
+                console.log("Updated coin values:", coinData);
+                $(".alert").hide();
             }
-            e.chart.render();
-        }
+            else {
+                let html =
+                    `
+                <div class="alert alert-info" role="alert">
+                Your favorite traced coins is empty.\n Please press the button (on the right hand side) for coins you wish to get live reports for
+               </div>
+                `;
+                $("#alertContainer").html(html);
+            }
 
+        } catch (error) {
+            console.error("Error fetching live reports data:", error);
+        }
+    }
+
+    function toggleDataSeries(e) {
+        if (typeof e.dataSeries.visible === "undefined" || e.dataSeries.visible) {
+            e.dataSeries.visible = false;
+        }
+        else {
+            e.dataSeries.visible = true;
+        }
+        e.chart.render();
     }
 
     // On click (More info button) display the first 3 letters of each coin:
@@ -317,14 +323,21 @@ $(() => {
         await handleMoreInfo(coinId);
     });
 
-    $("#homeLink").click(async () => await handleHome());
+    $("#homeLink").click(async () => {
+        clearInterval(liveReportsInterval); // Stop updating the graph when the user clicks on a another nav-link .
+        await handleHome();
+    });
 
     $("#reportsLink").click(async () => {
         await handleLiveReports();
-        setInterval(handleLiveReports, 2000); // Start updating the graph every 2 seconds
+        liveReportsInterval = setInterval(handleLiveReports, 2000); // Start updating the graph every 2 seconds.
+        hideProgressBar(); // Remove progress bar when about page is loaded.
     });
 
-    $("#aboutLink").click(() => hideProgressBar()); // Remove progress bar when about page is loaded.
+    $("#aboutLink").click(() => {
+        clearInterval(liveReportsInterval); // Stop updating the graph when the user clicks on a another nav-link.
+        hideProgressBar(); // Remove progress bar when about page is loaded.
+    });
 
     async function handleHome() {
         const coins = await getJson("coins.json");
@@ -359,7 +372,7 @@ $(() => {
         addToSessionStorage(coinId, coinInfo);
     }
 
-    // Add the "More Info" data to local *session* storage:
+    // Add the "More Info" data to *session* storage:
     function addToSessionStorage(coinId, coinInfo) {
         const saveData = sessionStorage.getItem(coinId);
         if (saveData) { // Check if coin ID already exist

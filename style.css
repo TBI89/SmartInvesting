@@ -136,3 +136,8 @@ body {
 #modal-card {
     opacity: 0.75;
 }
+
+.alert {
+   margin: auto;
+    width: 400px;
+}
