@@ -4,6 +4,9 @@
 
 $(() => {
 
+    // Load the "trackedCoins" array from storage: 
+    loadTrackedCoinsFromLocalStorage();
+
     // Display the first 100 coins each time the page is loaded:
     handleHome();
 
@@ -218,6 +221,23 @@ $(() => {
         localStorage.setItem(coinId, JSON.stringify(trackedCoins));
     }
 
+    function loadTrackedCoinsFromLocalStorage() {
+        for (const coinId in localStorage) {
+            if (localStorage.hasOwnProperty(coinId)) {
+                const trackedCoins = JSON.parse(localStorage.getItem(coinId));
+
+                if (Array.isArray(trackedCoins)) {
+                    trackedCoins.forEach(coin => {
+                        const toggleButton = $(`#flexSwitchCheckDefault_${coin.id}`);
+                        if (toggleButton.length) {
+                            toggleButton.prop("checked", true);
+                        }
+                    });
+                }
+            }
+        }
+    }
+
     // Remove coins that the user stopped tracking from local storage:
     function removeFromLongTermStorage(coinId) {
         localStorage.removeItem(coinId);
@@ -282,39 +302,33 @@ $(() => {
                 },
                 legend: {
                     cursor: "pointer",
-                    itemclick: toggleDataSeries,
                 },
                 data: dataSeries,
             };
 
             if (trackedCoins.length > 0) {
-                $("#chartContainer").CanvasJSChart(options);
-                console.log("Updated coin values:", coinData);
+                const chartContainer = $("#chartContainer").CanvasJSChart();
+
+                // Check if the chart already exists:
+                if (chartContainer) {
+                    chartContainer.options.data = dataSeries;  // Update the dataPoints of the existing chart
+                    chartContainer.render();
+                } else {// Create a new chart
+                    $("#chartContainer").CanvasJSChart(options);
+                }
                 $(".alert").hide();
-            }
-            else {
+            } else {
                 let html =
                     `
-                <div class="alert alert-info" role="alert">
-                Your favorite traced coins is empty.\n Please press the button (on the right hand side) for coins you wish to get live reports for
-               </div>
-                `;
+            <div class="alert alert-info" role="alert">
+            Your favorite traced coins is empty.\n Please press the button (on the right hand side) for coins you wish to get live reports for
+           </div>
+            `;
                 $("#alertContainer").html(html);
             }
-
         } catch (error) {
             console.error("Error fetching live reports data:", error);
         }
-    }
-
-    function toggleDataSeries(e) {
-        if (typeof e.dataSeries.visible === "undefined" || e.dataSeries.visible) {
-            e.dataSeries.visible = false;
-        }
-        else {
-            e.dataSeries.visible = true;
-        }
-        e.chart.render();
     }
 
     // On click (More info button) display the first 3 letters of each coin:
@@ -324,19 +338,23 @@ $(() => {
     });
 
     $("#homeLink").click(async () => {
-        clearInterval(liveReportsInterval); // Stop updating the graph when the user clicks on a another nav-link .
+        clearInterval(liveReportsInterval); // Stop updating the graph when the user clicks on another nav-link.
         await handleHome();
     });
 
     $("#reportsLink").click(async () => {
         await handleLiveReports();
-        liveReportsInterval = setInterval(handleLiveReports, 2000); // Start updating the graph every 2 seconds.
-        hideProgressBar(); // Remove progress bar when about page is loaded.
+
+        // Check if the interval is already set:
+        if (!liveReportsInterval) {
+            liveReportsInterval = setInterval(handleLiveReports, 2000); // Start updating the graph every 2 seconds.
+        }
+        hideProgressBar(); // Remove progress bar when the reports page is loaded.
     });
 
     $("#aboutLink").click(() => {
-        clearInterval(liveReportsInterval); // Stop updating the graph when the user clicks on a another nav-link.
-        hideProgressBar(); // Remove progress bar when about page is loaded.
+        clearInterval(liveReportsInterval); // Stop updating the graph when the user clicks on another nav-link.
+        hideProgressBar(); // Remove progress bar when the about page is loaded.
     });
 
     async function handleHome() {
