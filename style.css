@@ -69,9 +69,24 @@ body {
     cursor: pointer;
 }
 
+/* Unique font for the card content */
+@font-face {
+    font-family: "card-content";
+    src: url(assets/fonts/Angkor-Regular.ttf);
+}
+
 .card {
     display: inline-block;
     background-color: rgba(30, 144, 255, 0.6);
+    text-align: center;
+    font-family: "card-content";
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+/* Slight upward movement */
+.card:hover {
+    transform: translateY(-10px);
 }
 
 .nav-link {
@@ -97,12 +112,12 @@ body {
 .form-check-input {
     height: 20px;
     min-width: 40px;
-    margin-left: 210px;
+    /* margin-left: 200px; */
 }
 
 @font-face {
     font-family: "about";
-    src: url(assets/fonts/ShadowsIntoLight-Regular.ttf);
+    src: url(assets/fonts/Lumanosimo-Regular.ttf);
 }
 
 #about-image {
@@ -125,7 +140,7 @@ body {
 }
 
 .modal-dialog {
-    max-width: 1500px;
+    max-width: 1300px;
     max-height: 1500px;
 }
 
@@ -137,7 +152,13 @@ body {
     opacity: 0.75;
 }
 
+#chartContainer {
+    height: 100%;
+    width: 50%;
+    margin: auto;
+}
+
 .alert {
-   margin: auto;
+    margin: auto;
     width: 400px;
 }

@@ -33,25 +33,36 @@ $(() => {
 
     // Handle user searches:
     $("#form").submit(async function (event) {
-        event.preventDefault();
-        const searchInput = $("#searchInput").val();
-        await searchCoins(searchInput);
+        try {
+            event.preventDefault();
+            const searchInput = $("#searchInput").val();
+            await searchCoins(searchInput);
+        }
+        catch (err) {
+            console.log(err.message);
+        }
     });
 
     // Fetch coins data, filter coins & display results:
     async function searchCoins(query) {
         const coins = await getJson("coins.json");
+        // const coins = await getJson("https://api.coingecko.com/api/v3/coins/list"); Replace with that line to get live data.
         const searchResult = coins.filter(coin =>
-            coin.symbol.toLowerCase() === (query.toLowerCase()) // Result will display only if the user enters the whole symbol name
+            coin.symbol.toLowerCase() === (query.toLowerCase()) // Result will display only if the user enters the whole symbol name.
         );
         displayCoins(searchResult);
     }
 
     // Fetch coin data from the given url:
     async function getJson(url) {
-        const response = await fetch(url);
-        const json = await response.json();
-        return json;
+        try {
+            const response = await fetch(url);
+            const json = await response.json();
+            return json;
+        }
+        catch (err) {
+            console.log(err.message);
+        }
     }
 
     // Display the first 100 items on the page:
@@ -64,7 +75,7 @@ $(() => {
         coins = coins.filter(c => c.symbol && c.symbol.length <= 3);
         let html = "";
         for (let i = 0; i < Math.min(coins.length, 100); i++) {
-            html += `<div class="card" style="width: 18rem; height: 20rem; overflow: auto;">
+            html += `<div class="card" style="width: 15rem; height: 25rem; overflow: auto;">
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault_${coins[i].id}">
               <label class="form-check-label" for="flexSwitchCheckDefault"></label>
@@ -74,7 +85,7 @@ $(() => {
               <p class="card-text">${coins[i].name}</p>
           
               <button id="button_${coins[i].id}" class="btn btn-primary more-info" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_${coins[i].id}">
-                More info
+                More Info
               </button>
               <div style="min-height: 120px;">
                 <div class="collapse collapse-vertical w-100 p-3"  id="collapse_${coins[i].id}">
@@ -88,11 +99,11 @@ $(() => {
           `;
         }
         $("#coinsContainer").html(html);
-        hideProgressBar(); // Remove the progress bar when the coins are displayed
+        hideProgressBar(); // Remove the progress bar when the coins are displayed.
     }
 
     let trackedCoins = []; // Empty array to store tracked coins.
-    let selectedCoinIndex = -1; //Store the 6th coin's index.
+    let selectedCoinIndex = -1; // Store the 6th coin's index.
 
     // Track coins using the toggle button:
     $("#coinsContainer").on("click", ".form-check-input", function () {
@@ -162,8 +173,14 @@ $(() => {
 
     // Find coin by id:
     async function findCoinById(coinId) {
-        const coins = await getJson("coins.json");
-        return coins.find(coin => coin.id === coinId);
+        try {
+            const coins = await getJson("coins.json");
+            // const coins = await getJson("https://api.coingecko.com/api/v3/coins/list"); Replace with that line to get live data.
+            return coins.find(coin => coin.id === coinId);
+        }
+        catch (err) {
+            console.log(err.message);
+        }
     }
 
     // Display the coins tracked in the dialog:
@@ -171,7 +188,7 @@ $(() => {
         let html = "";
         for (let i = 0; i < trackedCoins.length; i++) {
             html += `
-            <div id="modal-card" class="card" style="width: 18rem; height: 20rem; overflow: auto;">
+            <div id="modal-card" class="card" style="width: 15rem; height: 25rem; overflow: auto;">
               <div class="card-body">
                 <h5 class="card-title">${trackedCoins[i].symbol}</h5>
                 <p class="card-text">${trackedCoins[i].name}</p> 
@@ -324,6 +341,16 @@ $(() => {
             `;
                 $("#alertContainer").html(html);
             }
+
+            const maxDataPoints = 4; // Max number of data points on the chart.
+
+            // Remove the oldest data point:
+            for (const coinSymbol in dataPointHistories) {
+                if (dataPointHistories[coinSymbol].length > maxDataPoints) {
+                    dataPointHistories[coinSymbol].shift();
+                }
+            }
+
         } catch (error) {
             console.error("Error fetching live reports data:", error);
         }
@@ -354,6 +381,7 @@ $(() => {
 
     async function handleHome() {
         const coins = await getJson("coins.json");
+        // const coins = await getJson("https://api.coingecko.com/api/v3/coins/list"); Replace with that line to get live data.
         console.log(coins);
         displayCoins(coins);
     }
@@ -362,16 +390,19 @@ $(() => {
     async function handleMoreInfo(coinId) {
         const coin = await getJson("https://api.coingecko.com/api/v3/coins/" + coinId);
         const imageSource = coin.image.thumb;
-        const usd = coin.market_data.current_price.usd;
-        const eur = coin.market_data.current_price.eur;
-        const ils = coin.market_data.current_price.ils;
+
+        // If the currencies for a given coin is undefined: display "N/A" (to avoid an error in promise):
+        const usd = coin.market_data.current_price.usd !== undefined ? coin.market_data.current_price.usd.toFixed(3) : 'N/A';
+        const eur = coin.market_data.current_price.eur !== undefined ? coin.market_data.current_price.eur.toFixed(3) : 'N/A';
+        const ils = coin.market_data.current_price.ils !== undefined ? coin.market_data.current_price.ils.toFixed(3) : 'N/A';
+
         const moreInfo = `
-  <div class="price-info">
-        <img src="${imageSource}"> <br>
-        USD $${usd}<br>
-        EUR:€ ${eur}<br>
-        ILS:₪ ${ils}
-    </div>
+            <div class="price-info">
+                <img src="${imageSource}"> <br>
+                USD $${usd !== 'N/A' ? usd : 'N/A'}<br>
+                EUR: €${eur !== 'N/A' ? eur : 'N/A'}<br>
+                ILS: ₪${ils !== 'N/A' ? ils : 'N/A'}
+            </div>
         `;
         $(`#collapse_${coinId}`).children().html(moreInfo);
 
