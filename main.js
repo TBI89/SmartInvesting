@@ -4,11 +4,11 @@
 
 $(() => {
 
-    // Load the "trackedCoins" array from storage: 
-    loadTrackedCoinsFromLocalStorage();
-
     // Display the first 100 coins each time the page is loaded:
     handleHome();
+
+    // Load the "trackedCoins" array from storage: 
+    loadTrackedCoinsFromLocalStorage();
 
     // Show the progress bar when the page is loading:
     function showProgressBar() {
@@ -91,8 +91,8 @@ $(() => {
         hideProgressBar(); // Remove the progress bar when the coins are displayed
     }
 
-    let trackedCoins = []; // Empty array to store tracked coins
-    let selectedCoinIndex = -1; //Store the 6th coin's index
+    let trackedCoins = []; // Empty array to store tracked coins.
+    let selectedCoinIndex = -1; //Store the 6th coin's index.
 
     // Track coins using the toggle button:
     $("#coinsContainer").on("click", ".form-check-input", function () {
@@ -104,7 +104,7 @@ $(() => {
         // Validation for turning on the toggle for 5 coins max:
         if (isChecked) {
             if (trackedCoins.length >= maxLimit) {
-                $(this).prop("checked", false); // On the 6th press: disable the toggle button & open bootstrap dialog
+                $(this).prop("checked", false); // On the 6th press: disable the toggle button & open bootstrap dialog.
                 selectedCoinIndex = coinId;
                 let html =
                     `
@@ -127,7 +127,7 @@ $(() => {
                 </div>
                 `;
                 $("body").append(html);
-                $("#dialogMsg").modal("show"); // Display the dialog
+                $("#dialogMsg").modal("show"); // Display the dialog.
                 displayCoinsTracked(trackedCoins);
             }
             else {
@@ -148,7 +148,7 @@ $(() => {
         }
         else {
 
-            // Remove the coin from the tracked coins array
+            // Remove the coin from the tracked coins array:
             const index = trackedCoins.findIndex(coin => coin.id === coinId);
             if (index !== -1) {
                 trackedCoins.splice(index, 1);
@@ -182,7 +182,7 @@ $(() => {
                   </div>
           `;
         }
-        $("#trackedCoinsContainer").html(html); // Update the content of trackedCoinsContainer
+        $("#trackedCoinsContainer").html(html); // Update the content of trackedCoinsContainer.
     }
 
     // Remove coin from the "trackedCoins" array & close dialog when the user clicks "Remove":
@@ -195,7 +195,7 @@ $(() => {
             console.log(`Coin ${coinId} was deleted from local storage`);
             const checkedCoin = $(`#flexSwitchCheckDefault_${coinId}`);
             if (checkedCoin.length) {
-                checkedCoin.prop("checked", false); // Uncheck the specific coin on the currencies section
+                checkedCoin.prop("checked", false); // Uncheck the specific coin on the currencies section.
             }
             console.log(`Coin ${coinId} has been removed from 'trackedCoins'`);
         }
@@ -210,7 +210,7 @@ $(() => {
         trackedCoins.push(selectedCoinIndex);
         addToLocalStorage(selectedCoinIndex, trackedCoins);
         const toggleButton = $(`#flexSwitchCheckDefault_${selectedCoinIndex}`);
-        toggleButton.prop("checked", true); // Check the specific coin on the currencies section 
+        toggleButton.prop("checked", true); // Check the specific coin on the currencies section.
         console.log("Coin " + selectedCoinIndex + " was added to 'trackedCoins");
         console.log(trackedCoins);
     });
@@ -221,16 +221,16 @@ $(() => {
         localStorage.setItem(coinId, JSON.stringify(trackedCoins));
     }
 
+    // Load the trackCoins arr from local storage:    
     function loadTrackedCoinsFromLocalStorage() {
         for (const coinId in localStorage) {
             if (localStorage.hasOwnProperty(coinId)) {
                 const trackedCoins = JSON.parse(localStorage.getItem(coinId));
-
                 if (Array.isArray(trackedCoins)) {
                     trackedCoins.forEach(coin => {
                         const toggleButton = $(`#flexSwitchCheckDefault_${coin.id}`);
                         if (toggleButton.length) {
-                            toggleButton.prop("checked", true);
+                            toggleButton.prop("checked", true); // Keep the switch "checked" when the page is refreshed.
                         }
                     });
                 }
@@ -258,17 +258,15 @@ $(() => {
         );
 
         try {
-            const coinData = Object.values(trackedCoinResponse).map(coin => coin.USD);
-
             for (const coinSymbol in trackedCoinResponse) {
                 const coinValue = trackedCoinResponse[coinSymbol].USD;
                 const dataPoint = { x: new Date(), y: coinValue };
 
                 if (!dataPointHistories[coinSymbol]) {
-                    dataPointHistories[coinSymbol] = []; // Create a new dataPointHistory array for the coin if it doesn't exist
+                    dataPointHistories[coinSymbol] = []; // Create a new dataPointHistory array for the coin if it doesn't exist.
                 }
 
-                dataPointHistories[coinSymbol].push(dataPoint); // Add the data point to the corresponding dataPointHistory array
+                dataPointHistories[coinSymbol].push(dataPoint); // Add the data point to the corresponding dataPointHistory array.
             }
 
             const dataSeries = Object.keys(dataPointHistories).map(coinSymbol => ({
@@ -277,7 +275,7 @@ $(() => {
                 showInLegend: true,
                 xValueFormatString: "HH:mm:ss",
                 yValueFormatString: "#,##0.00",
-                dataPoints: dataPointHistories[coinSymbol] // Use the corresponding dataPointHistory array for each coin
+                dataPoints: dataPointHistories[coinSymbol] // Use the corresponding dataPointHistory array for each coin.
             }));
 
             const options = {
@@ -311,9 +309,9 @@ $(() => {
 
                 // Check if the chart already exists:
                 if (chartContainer) {
-                    chartContainer.options.data = dataSeries;  // Update the dataPoints of the existing chart
+                    chartContainer.options.data = dataSeries;  // Update the dataPoints of the existing chart.
                     chartContainer.render();
-                } else {// Create a new chart
+                } else {// Create a new chart.
                     $("#chartContainer").CanvasJSChart(options);
                 }
                 $(".alert").hide();
@@ -344,11 +342,8 @@ $(() => {
 
     $("#reportsLink").click(async () => {
         await handleLiveReports();
-
-        // Check if the interval is already set:
-        if (!liveReportsInterval) {
-            liveReportsInterval = setInterval(handleLiveReports, 2000); // Start updating the graph every 2 seconds.
-        }
+        clearInterval(liveReportsInterval);  // Clear the existing interval if it is already set.
+        liveReportsInterval = setInterval(handleLiveReports, 2000);  // Update the graph every 2 seconds.
         hideProgressBar(); // Remove progress bar when the reports page is loaded.
     });
 
@@ -393,16 +388,16 @@ $(() => {
     // Add the "More Info" data to *session* storage:
     function addToSessionStorage(coinId, coinInfo) {
         const saveData = sessionStorage.getItem(coinId);
-        if (saveData) { // Check if coin ID already exist
-            console.log(`${coinId} already exist in session storage.`); //If yes: just send a message
+        if (saveData) { // Check if coin ID already exist.
+            console.log(`${coinId} already exist in session storage.`); //If yes: just send a message.
         }
         else {
-            sessionStorage.setItem(coinId, JSON.stringify(coinInfo)); // Else: send a message & add to storage
+            sessionStorage.setItem(coinId, JSON.stringify(coinInfo)); // Else: send a message & add to storage.
             console.log(`${coinId} added to session storage.`);
         }
         setTimeout(() => {
             sessionStorage.removeItem(coinId);
-            console.log(`${coinId} was removed from session storage`); // Remove all data after 2 minutes
+            console.log(`${coinId} was removed from session storage`); // Remove all data after 2 minutes.
         }, 120000);
     }
 
