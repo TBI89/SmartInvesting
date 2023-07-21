@@ -68,10 +68,15 @@ $(() => {
     // Display the first 100 items on the page:
     function displayCoins(coins) {
         if (!Array.isArray(coins) || coins.length === 0) {
-            $("#coinsContainer").html("No Coins Found").css({
-                "font-size": "xx-large",
-                "margin-top": "-40px"
-            });
+            $("#coinsContainer").html(
+                `   <div id="no-coins-found-card" class="card" style="width: 15rem; height: 25rem; overflow: auto;">
+              <div class="card-body">
+                <h5 id="no-coins-found-title class="card-title">No Coins Found</h5>
+                <p class="card-text">Please try a different search term.\n
+                Click the "Home" button to continue...</p> 
+                    </div>
+                  </div>`
+            );
             return;
         }
 
@@ -227,9 +232,9 @@ $(() => {
 
     // If the user clicks "Cancel" or "x" don't toggle the 6th coin:
     $("body").on("click", ".btn-close, #close-button", function (event) {
-        event.stopPropagation(); 
-        selectedCoinIndex = -1; 
-        $("#dialogMsg").modal("hide"); 
+        event.stopPropagation();
+        selectedCoinIndex = -1;
+        $("#dialogMsg").modal("hide");
     });
 
     // Add the new coin to "trackedCoins" arr & check his switch:
@@ -349,7 +354,7 @@ $(() => {
                 let html =
                     `
             <div class="alert alert-info" role="alert">
-            Your favorite traced coins is empty.\n Please press the button (on the right hand side) for coins you wish to get live reports for
+            Your favorite traced coins is empty.\n On the home page, please press the toggle button for coins you wish to get live reports for.
            </div>
             `;
                 $("#alertContainer").html(html);

@@ -61,6 +61,11 @@ body {
     margin-left: 10px;
 }
 
+#no-coins-found-card,
+#no-coins-found-title {
+    font-size: x-large;
+}
+
 #coinsContainer {
     display: flex;
     flex-wrap: wrap;
@@ -156,10 +161,18 @@ body {
     opacity: 0.75;
 }
 
+/* Default styles for the chart container: */
 #chartContainer {
-    height: 100%;
+    height: 300px;
     width: 50%;
     margin: auto;
+}
+
+/* Chart position for screens smaller than "sm" tier: */
+@media (max-width: 576px) {
+    #chartContainer {
+        width: 100%;
+    }
 }
 
 .alert {
