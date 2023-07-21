@@ -68,7 +68,10 @@ $(() => {
     // Display the first 100 items on the page:
     function displayCoins(coins) {
         if (!Array.isArray(coins) || coins.length === 0) {
-            $("#coinsContainer").html("No Coins Found");
+            $("#coinsContainer").html("No Coins Found").css({
+                "font-size": "xx-large",
+                "margin-top": "-40px"
+            });
             return;
         }
 
@@ -222,14 +225,24 @@ $(() => {
         $("#dialogMsg").modal("hide");
     });
 
+    // If the user clicks "Cancel" or "x" don't toggle the 6th coin:
+    $("body").on("click", ".btn-close, #close-button", function (event) {
+        event.stopPropagation(); 
+        selectedCoinIndex = -1; 
+        $("#dialogMsg").modal("hide"); 
+    });
+
     // Add the new coin to "trackedCoins" arr & check his switch:
     $("body").on("hidden.bs.modal", "#dialogMsg", () => {
-        trackedCoins.push(selectedCoinIndex);
-        addToLocalStorage(selectedCoinIndex, trackedCoins);
-        const toggleButton = $(`#flexSwitchCheckDefault_${selectedCoinIndex}`);
-        toggleButton.prop("checked", true); // Check the specific coin on the currencies section.
-        console.log("Coin " + selectedCoinIndex + " was added to 'trackedCoins");
-        console.log(trackedCoins);
+        if (selectedCoinIndex !== -1) {
+            trackedCoins.push(selectedCoinIndex);
+            addToLocalStorage(selectedCoinIndex, trackedCoins);
+            const toggleButton = $(`#flexSwitchCheckDefault_${selectedCoinIndex}`);
+            toggleButton.prop("checked", true); // Check the specific coin on the currencies section.
+            console.log("Coin " + selectedCoinIndex + " was added to 'trackedCoins");
+            console.log(trackedCoins);
+        }
+        selectedCoinIndex = -1; // Reset the selectedCoinIndex after the modal is hidden.
     });
 
     // Add the tracked coins to local storage (don't delete after 2 minuets):
